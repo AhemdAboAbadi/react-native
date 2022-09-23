@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { StyleSheet, View, FlatList, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import Header from "./components/Header";
 import ToDoItem from "./components/ToDoItem";
 import AddItem from "./components/AddItem";
@@ -18,33 +25,45 @@ export default function App() {
   };
 
   const handelSubmit = (textFromInput) => {
-    setToDo((prevText) => {
-      return [
-        { text: textFromInput, key: Math.random().toString() },
-        ...prevText,
-      ];
-    });
+    if (typeof textFromInput == "string" && textFromInput.length > 3) {
+      setToDo((prevText) => {
+        return [
+          { text: textFromInput, key: Math.random().toString() },
+          ...prevText,
+        ];
+      });
+    } else {
+      Alert.alert("OOPS!", "Todo must be over 3 chars long", [
+        { text: "Understood", onPress: () => console.log("alert closed") },
+      ]);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Header />
-      <View style={styles.content}>
-        <AddItem handelSubmit={handelSubmit} />
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View style={styles.container}>
+        <Header />
+        <View style={styles.content}>
+          <AddItem handelSubmit={handelSubmit} />
 
-        <View style={styles.list}>
-          <FlatList
-            data={toDo}
-            renderItem={({ item }) => (
-              <ToDoItem
-                item={item}
-                pressHandler={() => handelPress(item.key)}
-              />
-            )}
-          />
+          <View style={styles.list}>
+            <FlatList
+              data={toDo}
+              renderItem={({ item }) => (
+                <ToDoItem
+                  item={item}
+                  pressHandler={() => handelPress(item.key)}
+                />
+              )}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
